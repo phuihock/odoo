@@ -895,13 +895,17 @@ ListRenderer.include({
                 var column = this.columns[this.currentFieldIndex];
                 var lastWidget = this._getLastWidget();
                 if (column.attrs.name === lastWidget.name) {
-                    if (this.currentRow + 1 < this.state.data.length) {
+                    if (this.editable === 'bottom' && this.currentRow + 1 < this.state.data.length) {
                         this._selectCell(this.currentRow+1, 0, {wrap:false})
                             .fail(this._moveToNextLine.bind(this));
                     } else {
                         var currentRowData = this.state.data[this.currentRow];
                         if (currentRowData.isDirty(currentRowData.id)) {
-                            this._moveToNextLine();
+                            if (this.editable === 'bottom') {
+                                this._moveToNextLine();
+                            } else {
+                                this._moveToPreviousLine();
+                            }
                         }
                         else {
                             this.trigger_up('activate_next_widget');
@@ -917,7 +921,11 @@ ListRenderer.include({
                  }
                 break;
             case 'next_line':
-                this._moveToNextLine();
+                if (this.editable === 'bottom') {
+                    this._moveToNextLine();
+                } else {
+                    this._moveToPreviousLine();
+                }
                 break;
             case 'cancel':
                 // stop the original event (typically an ESCAPE keydown), to
